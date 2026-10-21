@@ -1,1 +1,44 @@
 
+name: SS OIL APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Projeyi indir
+        uses: actions/checkout@v4
+
+      - name: Java kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Flutter kur
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Android dosyalarini hazirla
+        run: |
+          if [ ! -f android/gradlew ]; then
+            flutter create --platforms=android --project-name ss_oil_stok_kontrol .
+          fi
+
+      - name: Paketleri yukle
+        run: flutter pub get
+
+      - name: APK olustur
+        run: flutter build apk --debug
+
+      - name: APK dosyasini kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: SS-OIL-APK
+          path: build/app/outputs/flutter-apk/app-debug.apk
+
